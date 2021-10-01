@@ -3,27 +3,29 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
+#include <ArduinoJson.h> 
 
 // Credentials
-const char *SSID = "SSID";
-const char *WIFI_PASSWORD = "Password";
-const char *OTA_USERNAME = "admin";
-const char *OTA_PASSWORD = "OTAPASSWORD";
+#include "wifi_credentials.h"
+#include "ota_credentials.h"
+
+#define TURN_ON HIGH
+#define TURN_OFF LOW
 
 // Connect an Relay to each GPIO of your ESP8266
-const int relay1 = 5;
-const int relay2 = 4;
-const int relay3 = 14;
-const int relay4 = 12;
+#define RELAY_1 5
+#define RELAY_2 4
+#define RELAY_3 14
+#define RELAY_4 12
 
 AsyncWebServer server(80);
 
 void setup()
 {
-  pinMode(relay1, OUTPUT);
-  pinMode(relay2, OUTPUT);
-  pinMode(relay3, OUTPUT);
-  pinMode(relay4, OUTPUT);
+  pinMode(RELAY_1, OUTPUT);
+  pinMode(RELAY_2, OUTPUT);
+  pinMode(RELAY_3, OUTPUT);
+  pinMode(RELAY_4, OUTPUT);
 
   SPIFFS.begin();
 
@@ -47,16 +49,33 @@ void setup()
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, PUT");
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
 
+  // Handing POST requests to turn on/off sockets
+  // server.addHandler(new AsyncCallbackJsonWebHandler("/switch", [](AsyncWebServerRequest *request, JsonVariant &json) {
+  //   const JsonObject &jsonObj = json.as<JsonObject>();
+  //   if (jsonObj["on"]) {
+  //     Serial.println("Turn on");
+  //     digitalWrite(RELAY_1, TURN_ON);
+  //   } else {
+  //     Serial.println("Turn off");
+  //     digitalWrite(RELAY_1, TURN_OFF);
+  //   }
+  //   request->send(200, "OK");
+  // }));
+
+  // Serving static content: HTML/CSS/JS files
   server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
-  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(SPIFFS, "/index.html", "text/html", false);
-  // });
-
-  // server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(SPIFFS, "/style.css", "text/css", false);
-  // });
-
+  // Handling not found addresses
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    if (request->method() == HTTP_OPTIONS) {
+      request->send(200);
+    } else {
+      Serial.println("Not found - " + request->url());
+      request->send(404, "Not found");
+    }
+  });
+  
+  // Starting Server
   AsyncElegantOTA.begin(&server, OTA_USERNAME, OTA_PASSWORD);
   server.begin();
   Serial.println("HTTP server started");
