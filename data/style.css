@@ -11,20 +11,23 @@
 	max-height: 200px;
 }
 
-body {
+html,body {
+	margin: 0;
+	padding: 0;
 	background-color: #f1f1f1;
 	font-family: 'Exo 2', sans-serif;
-	color: white;
 }
 
 .title {
 	background-color: #2196f3;
-	height: 100px;
 	text-align: center;
+	color: white;
+	height: 110px;
 }
 
 h1 {
-	padding-bottom: 30px;
+	padding: 30px;
+	margin: 0;
 }
 
 .room {
@@ -47,10 +50,6 @@ h1 {
 }
 
 .roomName {
-	text-align: center;
-}
-
-.roomName {
 	height: 25px;
 	margin-top: 0px;
 	padding-top: 10px;
@@ -59,7 +58,7 @@ h1 {
 	border-top-right-radius: 20px;
 	border-top-left-radius: 20px;
 	/* border-bottom: 1px solid #FC095F; */
-	color: #fff;
+	color: white;
 	text-align: center;
 }
 

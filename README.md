@@ -5,13 +5,13 @@ Navigate to `http://<NodeMCU_IP>` for dashboard/homepage.
 ## Features
 - [x] Connect to WiFi Access point
 - [x] OTA update
-- [ ] Working dashboard page
+- [x] Working dashboard page
+- [x] Get current states of devices on page load
 - [ ] Saving pin states in filesystem
 - [ ] Settings page
 
 ## Connecting to WiFi
 Put your **SSID** and **Password** in `src/wifi_credentials.h` file
-./src/wifi_credentials.h
 
 ## OTA update [^1]
 Navigate to `http://<NodeMCU_IP>/update`
