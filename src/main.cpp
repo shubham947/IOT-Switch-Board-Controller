@@ -1,26 +1,7 @@
-#include <FS.h>
-#include <ESP8266WiFi.h>
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
-#include <ArduinoJson.h> 
-#include <AsyncJson.h>
+#include "header.h"
 
-// Credentials
-#include "wifi_credentials.h"
-#include "ota_credentials.h"
-
-#define TURN_ON HIGH
-#define TURN_OFF LOW
-
-// Connect an Relay to each GPIO of your ESP8266
-#define RELAY_1 5
-#define RELAY_2 4
-#define RELAY_3 14
-#define RELAY_4 12
 
 AsyncWebServer server(80);
-
 
 // Get Relay based on deviceId
 int getRelay(String deviceId) {
@@ -87,20 +68,21 @@ void setup()
   server.addHandler(new AsyncCallbackJsonWebHandler("/getSwitchStates", [](AsyncWebServerRequest *request, JsonVariant &json) {
     const JsonObject &jsonObj = json.as<JsonObject>();
     JsonArray deviceIds = jsonObj["deviceIds"];
+    const int deviceIdArrSize = deviceIds.size();
     bool success = true;
     String res = "{\"";
 
     // Looping through deviceIds and fetching their states
-    for (int i=0; i < deviceIds.size(); i++) {
+    for (int i=0; i < deviceIdArrSize; i++) {
       int state = digitalRead(getRelay(deviceIds[i]));
       res += deviceIds[i] + "\":"+ state;
-      res += i<3 ? ",\"" : "}";
+      res += i < deviceIdArrSize - 1 ? ",\"" : "}";
       if (state == -1) {
         success = false;
       }
     }
 
-    Serial.println("Current device states: ");
+    Serial.print("Current device states: ");
     Serial.println(res);
 
     if (success) {

@@ -6,6 +6,10 @@ const deviceIds = ['R1D1','R1D2','R1D3','R1D4'];
 // Runs automatically on document load
 window.addEventListener('load', (event) => {
     initializeSwitches();
+    // Reload switch states every 10 sec
+    setInterval(() => {
+        initializeSwitches();
+    }, 10000);
 });
 
 // Get Initial states of Device switches

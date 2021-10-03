@@ -1,2 +1,2 @@
-#define OTA_USERNAME "OTA_USERNAME"
-#define OTA_PASSWORD "OTA_PASSWORD"
+#define OTA_USERNAME ""
+#define OTA_PASSWORD ""
