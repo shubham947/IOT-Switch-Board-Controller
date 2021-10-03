@@ -35,14 +35,32 @@ bool switchDeviceState(String deviceId, bool state) {
   return true;
 }
 
-void setup()
-{
+// Initiaze Pins/devices
+String initializePins() {
   pinMode(RELAY_1, OUTPUT);
   pinMode(RELAY_2, OUTPUT);
   pinMode(RELAY_3, OUTPUT);
   pinMode(RELAY_4, OUTPUT);
 
+  // Getting devices.json
+  DynamicJsonDocument devicesDoc(1024);
+  const String filepath = "/devices.json";
+  getJsonFile(filepath, devicesDoc);
+  JsonObject jObj = devicesDoc.as<JsonObject>();
+
+  // Looping over devices data from file
+  for(JsonPair p: jObj) {
+    String key = p.key().c_str();
+    switchDeviceState(key, devicesDoc[key]["state"]);
+  }
+  return "Initialized Pins.";
+}
+
+void setup() {
   SPIFFS.begin();
+
+  // Initiaze Pins/devices
+  initializePins();
 
   Serial.begin(9600);
   WiFi.mode(WIFI_STA);
@@ -94,16 +112,38 @@ void setup()
 
   // Handing POST requests to turn on/off sockets
   server.addHandler(new AsyncCallbackJsonWebHandler("/switch", [](AsyncWebServerRequest *request, JsonVariant &json) {
-    const JsonObject &jsonObj = json.as<JsonObject>();
-    bool success = switchDeviceState(jsonObj["deviceId"], jsonObj["state"]);
+    const JsonObject jsonObj = json.as<JsonObject>();
+    const String deviceId = jsonObj["deviceId"];
+    const bool state = jsonObj["state"];
+    bool success = false;
+
+    // Getting devices.json
+    DynamicJsonDocument devicesDoc(1024);
+    const String filepath = "/devices.json";
+    getJsonFile(filepath, devicesDoc);
+
+    // Checking whether device is locked
+    if (!devicesDoc[deviceId]["locked"]) {
+      success = switchDeviceState(deviceId, state);
+    } else if (devicesDoc["password"] == jsonObj["password"]) {
+      request->send(401, "UNAUTHORIZED");
+    } else {
+      request->send(403, "FORBIDDEN");
+    }
+    
+    // Sending response
     if (success) {
       request->send(200, "OK");
     } else {
       request->send(200, "FAIL");
     }
+    
+    // Updating devices.json
+    devicesDoc[deviceId]["state"] = state;
+    Serial.println(updateJsonFile(filepath, devicesDoc));
   }));
 
-  // Serving static content: HTML/CSS/JS files
+  // Serving static contents - HTML/CSS/JS files
   server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
   // Handling not found addresses

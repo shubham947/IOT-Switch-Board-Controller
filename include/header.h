@@ -6,6 +6,8 @@
 #include <ArduinoJson.h> 
 #include <AsyncJson.h>
 
+#include "fileController.h"
+
 // Credentials
 #include "wifi_credentials.h"
 #include "ota_credentials.h"

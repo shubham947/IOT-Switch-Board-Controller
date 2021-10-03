@@ -7,7 +7,9 @@ Navigate to `http://<NodeMCU_IP>` for dashboard/homepage.
 - [x] OTA update
 - [x] Working dashboard page
 - [x] Get current states of devices on page load
-- [ ] Saving pin states in filesystem
+- [x] Saving pin states in filesystem, to retain pin states over restart
+- [ ] Switching to AcessPoint/Hotspot mode, to change SSID & Password of WiFi, when not able to connect to WiFi
+- [ ] Password protecting device state
 - [ ] Settings page
 
 ## Connecting to WiFi

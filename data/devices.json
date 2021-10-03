@@ -1,0 +1,22 @@
+{
+    "R1D1": {
+        "name": "Device 1",
+        "state": false,
+        "locked": false
+    },
+    "R1D2": {
+        "name": "Device 2",
+        "state": false,
+        "locked": false
+    },
+    "R1D3": {
+        "name": "Device 3",
+        "state": false,
+        "locked": false
+    },
+    "R1D4": {
+        "name": "Device 4",
+        "state": false,
+        "locked": false
+    }
+}
